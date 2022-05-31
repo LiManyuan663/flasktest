@@ -6,6 +6,7 @@
 import sys
 import os
 import json
+import random
 
 sys.path.append('..')
 from similarities import Similarity
@@ -21,8 +22,10 @@ corpus = [
     '人在巴基斯坦基地的炸弹袭击中丧生',
 ]
 documents = []
-case=[]
-dpath = 'examples/data/document'
+case = []
+# dpath = './data/document' # 运行当前脚本
+dpath = 'examples/data/document'  # 运行app.py
+# cpath = './data/case'
 cpath = 'examples/data/case'
 dfiles = os.listdir(dpath)
 cfiles = os.listdir(cpath)
@@ -38,14 +41,16 @@ for file in cfiles:
 
 
 def selectSim(input):
-    model = Similarity(model_name_or_path="bert-base-uncased")
+    print("开始加载模型了")
+    model = Similarity(model_name_or_path="shibing624/text2vec-base-chinese")
     list1 = []
     for item in documents:
         list1.append(item['content'])
     model.add_corpus(list1)
+    print("开始寻找文书")
     res1 = model.most_similar(queries=input, topn=5)
     # print(res)
-    result={}
+    result = {}
     result1 = []
     for q_id, c in res1.items():
         print('query:', input[q_id])
@@ -55,15 +60,16 @@ def selectSim(input):
             print(corpus_id)
             result1.append({'text': documents[corpus_id], 'rate': ('%.2f' % s)})
 
-    result['document']=result1
+    result['document'] = result1
 
-    model.corpus={}
+    model.corpus = {}
     model.corpus_ids_map = {}
     model.corpus_embeddings = []
     list2 = []
     for item in case:
         list2.append(item['case'])
     model.add_corpus(list2)
+    print("开始寻找案例")
     res2 = model.most_similar(queries=input, topn=10)
     # print(res)
     result2 = []
@@ -75,25 +81,34 @@ def selectSim(input):
             print(corpus_id)
             result2.append({'text': case[corpus_id], 'rate': ('%.2f' % s)})
 
-    result['case']=result2
+    result['case'] = result2
+    print("匹配结束")
     return result
 
+
 def selectSim2(input):
-    model = Similarity(model_name_or_path="bert-base-uncased")
-    list=[]
-    for item in case:
-        list.append(item['case'])
-    model.add_corpus(list)
-    res = model.most_similar(queries=input, topn=10)
-    # print(res)
-    result = []
-    for q_id, c in res.items():
-        # print('query:', input[q_id])
-        # print("search top 10:")
-        for corpus_id, s in c.items():
-            # print(f'\t{case[corpus_id]}: {s:.4f}')
-            print(corpus_id)
-            result.append({'text': case[corpus_id], 'rate': ('%.2f' % s)})
+    print("虚假的筛选")
+    result = {}
+    # 5个文书
+    result1 = []
+    result2 = []
+    ran1 = random.sample(range(0, 13), 5)
+    print(ran1)
+    rate1 = sorted(random.sample(range(30, 60), 5))
+    rate1.reverse()
+    print(rate1)
+    # print(type(rate1))
+    for i in range(5):
+        result1.append({'rate': rate1[i], 'text':documents[ran1[i]]})
+    result['document'] = result1
+    # 10个案例
+    ran2 = random.sample(range(0,26),10)
+    rate2 = sorted(random.sample(range(30,60),10))
+    rate2.reverse()
+    for i in range(10):
+        result2.append(({'rate':rate2[i],'text':case[ran2[i]]}))
+    result['case'] = result2
+    print(result)
     return result
 
 

@@ -76,8 +76,8 @@ class Similarity(SimilarityABC):
     def __init__(
             self,
             corpus: Union[List[str], Dict[str, str]] = None,
-            model_name_or_path="bert-base-uncased",
-            max_seq_length=512,
+            model_name_or_path="shibing624/text2vec-base-chinese",
+            max_seq_length=128,
     ):
         """
         Initialize the similarity object.
@@ -85,6 +85,7 @@ class Similarity(SimilarityABC):
             default "shibing624/text2vec-base-chinese", refer: https://github.com/shibing624/text2vec
         :param corpus: Corpus of documents to use for similarity queries.
         """
+        print("在初始化模型")
         if isinstance(model_name_or_path, str):
             self.sentence_model = SentenceModel(model_name_or_path, max_seq_length=max_seq_length)
         elif hasattr(model_name_or_path, "encode"):
@@ -131,6 +132,7 @@ class Similarity(SimilarityABC):
         self.corpus_ids_map = {i: id for i, id in enumerate(list(self.corpus.keys()))}
         logger.info(f"Start computing corpus embeddings, new docs: {len(corpus_new)}")
         corpus_embeddings = self._get_vector(list(corpus_new.values()), show_progress_bar=True).tolist()
+        print("getVector结束")
         if self.corpus_embeddings:
             self.corpus_embeddings += corpus_embeddings
         else:
@@ -143,6 +145,7 @@ class Similarity(SimilarityABC):
         :param sentences:
         :return:
         """
+        print("在getVector")
         return self.sentence_model.encode(sentences, show_progress_bar=show_progress_bar)
 
     def similarity(self, a: Union[str, List[str]], b: Union[str, List[str]], score_function: str = "cos_sim"):

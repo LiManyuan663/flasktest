@@ -11,7 +11,8 @@ import numpy as np
 import torch
 import torch.nn.functional
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def cos_sim(a: Union[torch.Tensor, np.ndarray], b: Union[torch.Tensor, np.ndarray]):
